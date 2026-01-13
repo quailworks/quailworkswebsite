@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Site initialization
   initNavigation();
   initContactForm();
+  initScrollAnimations();
 });
 
 /**
@@ -61,4 +62,34 @@ function initContactForm() {
     // Note: Form will submit normally to Formspree
     // This just provides visual feedback during submission
   });
+}
+
+/**
+ * Initialize scroll-triggered animations
+ */
+function initScrollAnimations() {
+  const animatedElements = document.querySelectorAll('.animate-on-scroll');
+  if (animatedElements.length === 0) return;
+
+  // Check for reduced motion preference
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
+    // Show all elements immediately
+    animatedElements.forEach(el => el.classList.add('animate-on-scroll--visible'));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-on-scroll--visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  });
+
+  animatedElements.forEach(el => observer.observe(el));
 }
