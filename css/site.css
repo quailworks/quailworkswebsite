@@ -235,6 +235,15 @@ a { color: inherit; }
   width: auto;
 }
 
+/* The bird's box: it wraps the image and its motion layers (below) and takes
+   over the image's placement, so the layers sit on the bird exactly. The
+   image keeps its sizes. */
+.bird {
+  display: block;
+  position: relative;
+  width: fit-content;
+}
+
 h1 {
   max-width: 7.8em;                 /* always the same three lines */
   font-size: var(--t-display);
@@ -412,10 +421,10 @@ footer {
      17px here, 12px on the phone. The text stays left-aligned. */
   .hero-bird { justify-self: stretch; margin: 0 0 60px; }
 
-  .hero-bird img {
-    height: 340px;
+  .hero-bird img { height: 340px; }
+
+  .bird {
     margin-inline: auto;
-    position: relative;
     left: 17px;
   }
 }
@@ -465,6 +474,9 @@ footer {
   .hero-bird img {
     width: 192px;
     height: 241px;
+  }
+
+  .bird {
     margin-left: round(down, (100% - 192px) / 2, 1px);
     left: 12px;
   }
@@ -493,20 +505,96 @@ footer {
    screen. Same proportions, and the shift shrinks with it (17/340 of its
    height, 12/241 on the phone). Upright screens keep the bird as above. */
 @media (max-width: 999px) and (orientation: landscape) {
-  .hero-bird img {
-    height: min(340px, 30svh);
-    left: min(17px, 1.5svh);
-  }
+  .hero-bird img { height: min(340px, 30svh); }
+  .bird { left: min(17px, 1.5svh); }
 }
 
 @media (max-width: 720px) and (orientation: landscape) {
   .hero-bird img {
     width: min(192px, 30svh * 192 / 241);
     height: min(241px, 30svh);
+  }
+
+  .bird {
     margin-left: round(down, (100% - min(192px, 30svh * 192 / 241)) / 2, 1px);
     left: min(12px, 30svh * 12 / 241);
   }
 }
+
+/* ---------- The quail's motion ---------- */
+
+/* The bird moves in three small ways (js/motion.js): the topknot flicks,
+   the eye blinks, the pupil looks. It is never redrawn: its layers are
+   copies of the same image and one small drawing, laid over it in
+   fractions of the image box measured from the 758x951 master, and all
+   out of sight at rest, so the page at rest is the page without them.
+   - plume-base: the bird with everything above y 164.5 cut away, so no
+     stub of the stem stays upright when the crest tips
+   - plume: only the crest, plus a short root that drops from the two
+     corners where the stem meets the head into the solid head (x 168.3
+     to 223, inside the stem's own edges, so its corner never shows); it
+     turns on the stem's base (196.5, 166)
+   - socket: a white disc under the pupil, inside the white eye ring
+   - pupil: only the pupil (an ellipse of radius 34 around 166.65, 322.17)
+   - eyelid: an indigo lid that slides down inside the eye ring, then the
+     closed eye, a short curved white dash at the logo's line weight
+   All the moving is done by the script, with transform and opacity only;
+   this holds the layers' shapes and their rest. */
+.bird > .layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Hidden until the script has seen this stylesheet in force (the rule above
+   for the bird's images would otherwise undo the hidden attribute). */
+.bird > .layer[hidden] { display: none; }
+
+.bird > .plume-base { clip-path: inset(17.2976% 0 0 0); }
+
+.bird > .plume {
+  clip-path: polygon(-10% -10%, 110% -10%, 110% 16.6141%, 30.4749% 16.6141%, 29.4195% 17.4343%, 29.4195% 18.0862%, 22.2032% 18.0862%, 22.2032% 17.4027%, 21.6359% 16.6141%, -10% 16.6141%);
+  transform-origin: 25.9235% 17.4553%;
+}
+
+.bird > .socket {
+  left: 16.7082%;
+  top: 29.6708%;
+  width: 10.5541%;
+  height: 8.4122%;
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.bird > .pupil { clip-path: ellipse(4.4855% 3.5752% at 21.9852% 33.8769%); }
+
+.bird.looking > .socket,
+.bird.looking > .pupil { opacity: 1; }
+
+.bird > .eyelid {
+  left: 12.6649%;
+  top: 24.8160%;
+  width: 18.4697%;
+  height: 17.6656%;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.bird > .eyelid > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* At rest the lid waits above the eye, outside its clip, and the line is off. */
+.lid-shut { transform: translateY(-128px); }
+.lid-line { opacity: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
