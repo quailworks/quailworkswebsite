@@ -237,11 +237,15 @@ a { color: inherit; }
 
 /* The bird's box: it wraps the image and its motion layers (below) and takes
    over the image's placement, so the layers sit on the bird exactly. The
-   image keeps its sizes. */
+   image keeps its sizes. It answers taps (js/motion.js), so no gray tap box
+   on phones, and it stays out of text selections. */
 .bird {
   display: block;
   position: relative;
   width: fit-content;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 h1 {
@@ -596,6 +600,17 @@ footer {
 .lid-shut { transform: translateY(-128px); }
 .lid-line { opacity: 0; }
 
+/* Forced colors (Windows High Contrast): the image keeps its ink and its white
+   lines show the forced page color, so the closed eye and the disc under the
+   pupil take that color (Canvas) and the lid keeps the ink. */
+@media (forced-colors: active) {
+  .bird > .socket,
+  .bird > .eyelid { forced-color-adjust: none; }
+  .bird > .socket { background: Canvas; }
+  .lid-line path { stroke: Canvas; }
+  .lid-line circle { fill: Canvas; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
@@ -605,4 +620,9 @@ footer {
 @media print {
   .button { background: none; color: var(--ink); outline: 1px solid; }
   .hero { min-height: 0; }
+
+  /* The bird prints as the plain image: no looking pupil without its white
+     disc (backgrounds are dropped), no flick caught halfway. */
+  .bird > .layer { display: none !important; }
+  .bird > .bird-img { opacity: 1 !important; }
 }
