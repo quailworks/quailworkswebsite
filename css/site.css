@@ -527,8 +527,9 @@ footer {
 
 /* ---------- The quail's motion ---------- */
 
-/* The bird moves in three small ways (js/motion.js): the topknot flicks,
-   the eye blinks, the pupil looks. It is never redrawn: its layers are
+/* The bird moves in three small ways (js/motion.js): the topknot flicks
+   (and jiggles while the page scrolls), the eye blinks, the pupil looks.
+   It is never redrawn: its layers are
    copies of the same image and one small drawing, laid over it in
    fractions of the image box measured from the 758x951 master, and all
    out of sight at rest, so the page at rest is the page without them.
